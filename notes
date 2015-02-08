@@ -1,0 +1,232 @@
+
+Continuous Delivery
+ - Seminal Text by Jez Humble & David Farley
+ - ContinuousDelivery vs. CI: defition of done fundamentally changes
+ - Software is always in a release ready state
+ - CD defines the mechanics around doing that
+
+Continuous Integration Steps
+ - CI lifecycle includes SCM, tests, static analysis/quality.
+ - Ultimately produces binary which you store in a repository like Nexus or Artifactory
+ - Goal is to give feedback to developers as fast as possible.
+ - The code is always 'runnable'
+ 
+Continuous Delivery Steps
+ - Expands the scope because the goal is to always be release ready
+ - Calls for deeper QA, performance testing, User Acceptance Testing
+ - Releases may be gated by QA or product owner
+ - May push to preprod environment
+ - Ops Team may deliver, using techniques like blue/green deployment
+ - CD goes beyond CI to include the delivery process.
+
+Continuous Delivery Pipeline
+ - All of this can be thought of as a CD pipeline
+ - Starts with compiling, goes through potentially parallel tests
+ - Selenium tests, etc.
+ - May require retry if something goes wrong
+ - Deployment steps, which may require approval
+ - These steps need to share the artifacts througout the pipeline.
+
+Jenkins: Hub of Continuous Delivery
+ - Jenkins connects the pieces and teams together
+
+CI/CD with Jenkins and Vagrant and Puppet
+ - Deployment and Config automation is part of the process
+ - Puppet and Chef scripts stored in Git repos
+ - Perhaps using Vagrant, test those scripts locally in a Jenkins job
+ - Use Jenkins to push those scripts to different environments
+ - There are Jenkins plugins for Chef and Puppet which help you track the deployment of binaries 
+
+Jenkins - Puppet Integration
+ - Jenkins allows you to trace the deployment of a binary back to the code commits that went into that binary 
+ - You now know where and when those binaries were deployed
+ - Provides end-to-end tracability
+
+CD Pipeline -> Workflow
+ - Why call it workflow?
+ - It's a lot more than a pipeline
+
+What we need
+ - Community really wanted this stored as text in a source code control system.
+
+Most Existing Workflow in Jenkins today
+ - Job chaining - one job can trigger another
+ - Build flow plugin - similar textual representation, but not as robust
+ - Build pipeline plugin & Build delivery pipeline - visualizations
+ - Jenkins is already being used for CD, and this drove the design of workflow. 
+
+Most Existing Workflow in Jenkins Today
+ - Limitations of Jenkins before workflow
+   - Many small builds which are chained together, but hard to follow
+   - Hard to share state between jobs
+   - Limitations on logic - lacks looping, try/catch, 
+   - Many different adhoc solutions to the same problems
+
+Jenkins Workflow Engine
+
+Simplifying Our Sample Workflow
+ - Demo is spring-petclinic, a java web app
+ - perf tests - JMeter, a performance testing framework
+ - Selenium tests - browser based tests which can be glitchy, may need retry
+ - Sonar Analysis - static source code analysis
+ - Won't cover production deployment -- lame
+
+What we need
+ - Point out Mutiple stages in diagram
+ - Point out fork & join in parallel tasks
+ - Loops are needed for selenium
+ - Long running builds - performance tests can take several hours
+ - UAT can take days - want to be able to restart server without losing state
+ - Human actions - UAT for example
+ - Restartable builds - sometimes environments are unavailable, causing errors
+ - Reuse definitions - shared across organization
+ - Comprehensible scripts - one script which contains the entire defition instead of lots of seperate jobs
+
+New Worklow Syntax
+ - Point out stages
+ - Point out parallel tasks
+ - For example, iPhone application could be built on a seperate node
+ - Don't get too deep, just give an idea of what it looks like
+
+Production Release Available Now
+ - Workflow 1.2 is actually the latest as of February
+ - Can use latest OSS weekly or 1.580.x LTS
+
+Demo Time!
+
+- Show Jenkins UI
+- Create new job of type "Workflow"
+
+- Show existing Petclinic job
+- Very similar to existing jobs, contains many of the same features
+- Instead of build steps, we have one workflow definition
+
+- Trigger the job and show it running
+
+- Open IDE
+
+- Show groovy script
+- Java-like syntax - allows you to use IDE for editing, syntax highlighting
+
+- Show details of script
+- Explain git checkout
+- Explain ensureMaven()
+
+(Back to slides)
+
+Key Features
+
+ - Can restart Jenkins because all variables are persisted to disk atcheckpoints
+ - Discuss stages - go back to pipeline to discuss throttling. Stages let you divide up the build for better reporting
+ - Throttling - means that we only want one build executing at once
+ - Human input - can apply security roles and authorization
+ - Will enable you to use all of the 1000 plugins in Jenkins
+
+Groovy DSL  vs. Graphical Workflow
+ - Why not use graphical designer?
+ - Flow control is easy and familiar in Groovy/scripting
+ - We expect the community will provide the graphical tools on top of workflow
+
+Project Setup
+  - A single job instead of multiple jobs
+  - A single script instead of multiple steps
+  
+(Back to Demo)
+
+Job should have been running and is now paused for input.
+
+Show nice message by hovering on stage
+Show test application.
+Show build and click on "Paused for Input"
+
+(Back to slides)
+
+Non-sequential Logic
+
+- Point out each type of logic.
+- Examples of 
+   parallel - start databases, deploy binaries, start servers
+- try lets you recover gracefully from an error instead of ending the job with an error.
+
+
+Interaction with Humans
+ - Note that this input only allows the QA role, as defined in the Jenkins SecurityRealm
+
+Restartable Build/Checkpoint
+
+ - Let's you restart a build at a known checkpoint
+ - This is only available in Jenkins Enterprise by CloudBees
+
+Visualization
+ - Also a part of JE by CloudBees
+ - Key points: Duration, Restart buttons, Artifact download buttons
+
+(Demo)
+
+Demonstrate Restarting from a checkpoint
+
+(Slides)
+
+Stages
+ - Allows human readable naming
+ - Shows OSS rendering on slide
+
+(Demo)
+
+Show all the steps in the flow. Show that you can click into the consoles.
+
+(Slides)
+
+Comprehensible Scripts
+ Show that libraries can be shared. They are just grooy scripts.
+
+ - Jenkins experts can create the libraries while others use them in workflows.
+
+Workflow Syntax Card
+
+stage - Enhances readability and graphical display
+node - Runs the given script on a Jenkins slave. ie, windows, mac,
+ws - Create a fresh isolated workspace and run the given script in that workspace
+parallel - 
+retry - For glitchy steps
+catchError - Ignore failures in a given block
+
+Workflow Syntax Card (2)
+
+load - Evaluate Groovy source from a library
+step - Call a build step which is not yet workflow compatible  (show example in script)
+
+Workflow Syntax Card (3)
+
+archive - Copies the artifacts to Jenkins from the slave for later
+unarchive - Allows you to copy an artifact to new slave without rebuilding it
+
+Show unarchive/unarchive example in script
+
+Workflow Syntax Card (4)
+
+scm - compatible with other SCM providers and can be used for extra options when needed for git & svn
+
+tool - Install a tool like Maven or JDK
+build - Interop with existing non-workflow jobs
+checkpoint - (JE Only) - persists state of flow to disk (including variables)
+
+(Demo)
+
+Back to workflow job configuration
+Snippet Generator - shows all available steps. Shoe some examples.
+
+Possible Futures
+
+OSS
+
+- Multi-branch project - automatically detecting multiple branches of a project and displaying them coherently.
+
+JE/JOC
+
+- Validated merge - You push code to Jenkins instead of your repository. Only if the build passes does Jenkins merge the code into the repository for you.
+
+- Deployment - Blue/green - (May not need to explain, but if so): A deployment pattern where you deploy to fresh or backup nodes which aren't live. You then cut traffic over from the live nodes to the nodes with th new deployment. Allows you to rollback to old version quickly.
+
+- Template integration in Jenkins Enterprise. Templates let you parameterize and reuse job definitions.
+
