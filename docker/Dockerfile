@@ -42,5 +42,5 @@ RUN rsync -a $CATALINA_HOME/ /opt/apache-tomcat-8-qa/ \
 WORKDIR /var/lib/jenkins
 ADD JENKINS_HOME /var/lib/jenkins
 
-ADD m2repo /root/.m2/repo
+ADD m2repo /root/.m2/repository
 ADD .cloudbees-license /root/.cloudbees-license

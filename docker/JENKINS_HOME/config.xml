@@ -28,7 +28,7 @@
         <port>22</port>
         <credentialsId>root-login</credentialsId>
       </launcher>
-      <label>linux</label>
+      <label>linux slave</label>
       <nodeProperties/>
       <userId>anonymous</userId>
     </slave>
@@ -44,7 +44,7 @@
         <port>22</port>
         <credentialsId>root-login</credentialsId>
       </launcher>
-      <label>linux</label>
+      <label>linux slave</label>
       <nodeProperties/>
       <userId>anonymous</userId>
     </slave>
