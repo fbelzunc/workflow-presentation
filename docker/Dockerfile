@@ -43,4 +43,3 @@ WORKDIR /var/lib/jenkins
 ADD JENKINS_HOME /var/lib/jenkins
 
 ADD m2repo /root/.m2/repository
-ADD .cloudbees-license /root/.cloudbees-license
